@@ -16,7 +16,7 @@ const Booking = require('./models/booking');
 const app = express();
 app.use(
   cors({
-    origin: 'http://localhost:5173', // Replace with your frontend's URL
+    origin: process.env.CLIENT_URL, // Replace with your frontend's URL
     credentials: true, // Enable credentials sharing
   }),
 );
