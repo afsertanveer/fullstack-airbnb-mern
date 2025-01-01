@@ -12,14 +12,28 @@ const UserContextProvider = ({ children }) => {
 
   useEffect(() => {
     const fetchUser = async () => {
-      try {
-        await axios.get('/profile').then(({ data }) => {
-          setUser(data);
-        });
-      } catch {
-        setUser(null);
-      } finally {
-        setIsLoading(false);
+      const token = sessionStorage.getItem('token');
+      console.log(token);
+      if (token) {
+        try {
+          // await axios.get('/profile').then(({ data }) => {
+          //   setUser(data);
+          //   sessionStorage.setItem('token', data);
+          // });
+          await axios
+            .get('/profile', {
+              headers: {
+                Authorization: `${token}`, // Add the token to the header
+              },
+            })
+            .then(({ data }) => {
+              setUser(data);
+            });
+        } catch {
+          setUser(null);
+        } finally {
+          setIsLoading(false);
+        }
       }
     };
     fetchUser();

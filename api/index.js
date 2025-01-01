@@ -42,20 +42,45 @@ app.get('/test', (req, res) => {
 
 /// user apis starts ///
 
-app.get('/profile', async (req, res) => {
-  const { token } = req.cookies;
+//cookies
 
-  if (token) {
+// app.get('/profile', async (req, res) => {
+//   const { token } = req.cookies;
+
+//   if (token) {
+//     jwt.verify(token, process.env.JWT_SECRET, {}, (err, data) => {
+//       if (err) {
+//         return res.status(403).json({ error: 'Invalid token' }); // Handle invalid token gracefully
+//       }
+//       return res.status(200).json(data); // Successfully return the decoded data
+//     });
+//   } else {
+//     return res
+//       .status(401)
+//       .json({ error: 'Authentication error: Token missing' }); // Handle missing token
+//   }
+// });
+
+//session
+app.get('/profile', async (req, res) => {
+  const { authorization } = req.headers;
+  // console.log('auth', authorization);
+  if (authorization && authorization.startsWith('Bearer ')) {
+    const token = authorization.split(' ')[1]; // Extract token after 'Bearer ' prefix
+
     jwt.verify(token, process.env.JWT_SECRET, {}, (err, data) => {
       if (err) {
+        console.log(err);
         return res.status(403).json({ error: 'Invalid token' }); // Handle invalid token gracefully
       }
+
+      // console.log('hi from profile');
       return res.status(200).json(data); // Successfully return the decoded data
     });
   } else {
     return res
       .status(401)
-      .json({ error: 'Authentication error: Token missing' }); // Handle missing token
+      .json({ error: 'Authentication error: Token missing or invalid' }); // Handle missing or invalid token
   }
 });
 
@@ -100,6 +125,16 @@ app.post('/login', async (req, res) => {
         (err, token) => {
           if (err) return res.status(500).json(err);
           // return res.cookie('token', token).status(200).json(isExist);
+          // console.log(token);
+          return res.status(200).json({
+            token: `Bearer ${token}`, // Include "Bearer" prefix for clarity
+            data: {
+              id: isExist._id,
+              name: isExist.name,
+              email: isExist.email,
+              role: isExist.role,
+            },
+          });
         },
       );
     } else {
@@ -110,6 +145,11 @@ app.post('/login', async (req, res) => {
   }
 });
 
+// app.post('/logout', async (req, res) => {
+//   res.cookie('token', '').json(true);
+// });
+
+//session logout
 app.post('/logout', async (req, res) => {
   res.cookie('token', '').json(true);
 });

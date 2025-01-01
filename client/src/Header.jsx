@@ -1,14 +1,12 @@
 import React, { useContext, useState } from 'react';
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
-import { toast } from 'react-toastify';
 import { UserContext } from './pages/contexts/UserContext';
-import axios from './pages/utils/axios';
 
 function Header() {
   const { user, setUser } = useContext(UserContext);
   const [showMenu, setShowMenu] = useState(false);
   const location = useLocation();
-  const navigator = useNavigate();
+  const navigate = useNavigate();
   // console.log(location.pathname);
   const [classValue, setClassVlaue] = useState(
     'hidden absolute right-2 shadow-lg  mt-8 ',
@@ -38,15 +36,10 @@ function Header() {
       setClassVlaue('hidden absolute right-2  mt-8 ');
     }
   };
-  async function logout() {
-    await axios
-      .post('/logout')
-      .then(({ data }) => {
-        setUser(null);
-        toast('Logged Out Successfully');
-        navigator('/login');
-      })
-      .catch((err) => alert(err));
+  function logout() {
+    sessionStorage.clear();
+    setUser(null);
+    window.location.href = '/login';
   }
   return (
     <header className="flex justify-between">
