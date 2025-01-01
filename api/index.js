@@ -7,6 +7,7 @@ const jwt = require('jsonwebtoken');
 const cookieParser = require('cookie-parser');
 const imageDownloader = require('image-downloader');
 const mongoose = require('mongoose');
+const cloudinary = require('cloudinary').v2;
 const path = require('path');
 const User = require('./models/User');
 const upload = require('./utils/multer');
@@ -14,6 +15,7 @@ const Place = require('./models/place');
 const check = require('./utils/checkMiddleWare');
 const Booking = require('./models/booking');
 const app = express();
+console.log(process.env.CLIENT_URL);
 app.use(
   cors({
     origin: process.env.CLIENT_URL, // Replace with your frontend's URL
@@ -23,6 +25,12 @@ app.use(
 app.use(express.json());
 app.use(cookieParser());
 app.use('/uploads', express.static(__dirname + '/uploads'));
+cloudinary.config({
+  cloud_name: process.env.CLOUD_NAME,
+  api_key: process.env.CLOUD_API_KEY,
+  api_secret: process.env.CLOUD_API_SECRET, // Click 'View API Keys' above to copy your API secret
+  secure: true,
+});
 
 const bcryptSalt = bcrypt.genSalt(12);
 // console.log('connection string:', process.env.MONGODB_CONNECTION_STRING);
@@ -52,13 +60,14 @@ app.get('/profile', async (req, res) => {
 });
 
 app.post('/register', async (req, res) => {
-  const { name, email, password } = req.body;
+  const { name, email, password, role } = req.body;
   const userPassword = await bcrypt.hash(password, 10);
   let user;
   try {
     user = new User({
       name,
       email,
+      role,
       password: userPassword,
     });
     await user.save();
@@ -80,12 +89,17 @@ app.post('/login', async (req, res) => {
     const isValidPassword = await bcrypt.compare(password, isExist.password);
     if (isValidPassword) {
       jwt.sign(
-        { email: isExist.email, id: isExist._id, name: isExist.name },
+        {
+          email: isExist.email,
+          id: isExist._id,
+          name: isExist.name,
+          role: isExist.role,
+        },
         process.env.JWT_SECRET,
         {},
         (err, token) => {
           if (err) return res.status(500).json(err);
-          return res.cookie('token', token).status(200).json(isExist);
+          // return res.cookie('token', token).status(200).json(isExist);
         },
       );
     } else {
@@ -112,15 +126,15 @@ app.post('/upload-by-link', async (req, res) => {
   }
 
   try {
-    const newName = `photo-${Date.now()}.jpg`;
-    const uploadPath = path.join(__dirname, 'uploads', newName);
-
-    await imageDownloader.image({
-      url: link,
-      dest: uploadPath,
-    });
-
-    return res.status(200).json(newName);
+    const newName = `photo-${Date.now()}`;
+    const uploadResult = await cloudinary.uploader
+      .upload(link, {
+        public_id: newName,
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+    return res.status(200).json(uploadResult);
   } catch (error) {
     console.error('Error downloading image:', error);
     return res.status(500).json({ error: 'Failed to download image' });

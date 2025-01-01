@@ -7,6 +7,7 @@ const UserSchema = new mongoose.Schema({
     unique: true,
     require: true,
   },
+  role: Number, // 0-admin,1-owner,2-user
   password: String,
 });
 
