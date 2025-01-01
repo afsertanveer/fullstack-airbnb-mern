@@ -24,7 +24,7 @@ const Carousel = ({ photos }) => {
             className="flex-shrink-0 w-full h-64 md:h-96 lg:h-120"
           >
             <img
-              src={`${import.meta.env.VITE_API_URL}/uploads/${slide}`}
+              src={`${slide}`}
               alt={`Slide ${index + 1}`}
               className="w-full h-full object-cover rounded-lg"
             />

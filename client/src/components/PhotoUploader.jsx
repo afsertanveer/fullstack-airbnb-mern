@@ -9,6 +9,7 @@ function PhotoUploader({
   uploadPhoto,
   setAddedPhotoes,
 }) {
+  // console.log('all', addedPhotoes);
   const removePhoto = (e, link) => {
     e.preventDefault();
     setAddedPhotoes(addedPhotoes.filter((p) => p !== link));
@@ -41,7 +42,11 @@ function PhotoUploader({
           addedPhotoes.length > 0 &&
           addedPhotoes.map((link, idx) => (
             <div key={idx} className="relative h-32 flex">
-              <img className="rounded-2xl w-full object-cover" alt="" />
+              <img
+                src={link}
+                className="rounded-2xl w-full object-cover"
+                alt=""
+              />
               <button
                 onClick={(e) => removePhoto(e, link)}
                 className="cursor-pointer absolute bottom-1 right-1 bg-black bg-opacity-50 rounded-2xl py-2 px-3"
@@ -50,7 +55,7 @@ function PhotoUploader({
                   xmlns="http://www.w3.org/2000/svg"
                   fill="none"
                   viewBox="0 0 24 24"
-                  src={`${import.meta.env.VITE_API_URL}/uploads/${link}`}
+                  src={`${link}`}
                   strokeWidth={1.5}
                   stroke="currentColor"
                   className="text-white size-6"

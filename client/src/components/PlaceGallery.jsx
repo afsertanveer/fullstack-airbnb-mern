@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 
 function PlaceGallery({ place }) {
   const [showAllPhotos, setShowAllPhotos] = useState(false);
+  // const {user} =
   if (showAllPhotos) {
     return (
       <div className="absolute inset-0  min-h-screen ">
@@ -29,12 +30,7 @@ function PlaceGallery({ place }) {
           {place?.photos?.length > 0 &&
             place.photos.map((photo) => (
               <div key={photo}>
-                <img
-                  className="w-full"
-                  src={`${import.meta.env.VITE_API_URL}/uploads/${
-                    photo || 'default.jpg'
-                  }`}
-                />
+                <img className="w-full" src={`${photo || 'default.jpg'}`} />
               </div>
             ))}
         </div>
@@ -49,9 +45,7 @@ function PlaceGallery({ place }) {
             <img
               className="object-cover w-full h-full cursor-pointer"
               onClick={() => setShowAllPhotos(true)}
-              src={`${import.meta.env.VITE_API_URL}/uploads/${
-                place?.photos?.[0] || 'default.jpg'
-              }`}
+              src={`${place?.photos?.[0] || 'default.jpg'}`}
               alt={place.title}
             />
           </div>
@@ -60,18 +54,14 @@ function PlaceGallery({ place }) {
           <img
             className="object-cover w-full h-full cursor-pointer"
             onClick={() => setShowAllPhotos(true)}
-            src={`${import.meta.env.VITE_API_URL}/uploads/${
-              place?.photos?.[1] || 'default.jpg'
-            }`}
+            src={`${place?.photos?.[1] || 'default.jpg'}`}
             alt={`${place.title} photo ${1 + 1}`}
           />
           <div className="overflow-hidden">
             <img
               className="object-cover w-full h-full cursor-pointer"
               onClick={() => setShowAllPhotos(true)}
-              src={`${import.meta.env.VITE_API_URL}/uploads/${
-                place?.photos?.[2] || 'default.jpg'
-              }`}
+              src={`${place?.photos?.[2] || 'default.jpg'}`}
               alt={`${place.title} `}
             />
           </div>

@@ -21,7 +21,12 @@ function PlacesFormPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [price, setPrice] = useState(100);
   const navigate = useNavigate();
+
   // console.log(import.meta.env.VITE_API_URL);
+
+  const cloudName = import.meta.env.VITE_CLOUD_NAME;
+  const uploadPreset = import.meta.env.VITE_UPLOAD_PRESET;
+
   function inputHeader(text) {
     return <h2 className="text-2xl mt-4 ">{text}</h2>;
   }
@@ -43,35 +48,40 @@ function PlacesFormPage() {
       .then(({ data }) => {
         console.log(data);
         setAddedPhotoes((prev) => {
-          return [...prev, data];
+          return [...prev, data.secure_url];
         });
         setPhotoLink('');
       });
   }
   const uploadPhoto = async (e) => {
     e.preventDefault();
-    setIsLoading(true);
     const files = e.target.files;
     // console.log(files);
-    const data = new FormData();
-    for (let i = 0; i < files.length; i++) {
-      data.append('photos', files[i]);
-    }
-    await axios
-      .post('/upload-photos', data, {
-        headers: {
-          'Content-type': 'multipart/form-data',
-        },
-      })
-      .then(({ data }) => {
-        console.log('prev added photos', addedPhotoes);
-        setAddedPhotoes((prev) => {
-          return [...prev, ...data];
-        });
-        setIsLoading(false);
-        console.log('after added photos', addedPhotoes);
+    const urls = addedPhotoes;
+
+    for (const file of files) {
+      setIsLoading(true);
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('upload_preset', uploadPreset);
+
+      try {
+        const response = await fetch(
+          `${import.meta.env.VITE_CLOUND_UPLOAD_API}`,
+          {
+            method: 'POST',
+            body: formData,
+          },
+        );
+        const data = await response.json();
         console.log(data);
-      });
+        urls.push(data.secure_url);
+        setAddedPhotoes(urls);
+        setIsLoading(false);
+      } catch (error) {
+        console.error('Error uploading file:', error);
+      }
+    }
   };
   const addNewPlace = async (e) => {
     e.preventDefault();
